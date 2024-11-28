@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const courseSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -15,33 +14,34 @@ const courseSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Course price is required']
   },
-  thumbnail: String,
-
-  duration: Number,
+  thumbnail: {
+    type: String,
+  },
+  duration: {
+    type: Number,
+  },
   sections: [{
     title: {
       type: String,
       required: true,
       trim: true
     },
-    lessons : [
-      {
-        title: {
-          type: String,
-          required: true,
-          trim: true
-        },
-       
-        
-        videoUrl: String,
-        duration: {
-          type: Number,
-         
-          
-        },
-        resources: [String],  
-      }
-    ]  
+    lessons: [{
+      title: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      videoUrl: {
+        type: String,
+      },
+      duration: {
+        type: Number,
+      },
+      resources: [{
+        type: String,
+      }],
+    }]
   }],
   level: {
     type: String,
@@ -52,14 +52,19 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
- 
-    totalStudents: {
+  totalStudents: {
     type: Number,
     default: 0
   },
-  whoIsThisCourseFor: [Array],
-  skills: [Array],
-  whatYouWillLearn: [Array],
+  whoIsThisCourseFor: [{
+    type: String,
+  }],
+  skills: [{
+    type: String,
+  }],
+  whatYouWillLearn: [{
+    type: String,
+  }],
 }, {
   timestamps: true
 });

@@ -8,5 +8,8 @@ router.get('/',verifyAccessToken, getUser)
 router.post('/register', userRegister);
 router.post('/login', loginUser);
 router.post('/logout',verifyAccessToken, logut);
-
+router.get('/users', verifyAccessToken, async(req, res) => {
+    const data = await User.find();
+    res.send(data);
+});
 module.exports = router;

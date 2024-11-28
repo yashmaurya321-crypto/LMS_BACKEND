@@ -11,7 +11,7 @@ const { verifyAccessToken } = require('../controllers/AuthController')
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 // Route to create a course
-router.post('/courses', createCourse);
+router.post('/courses', upload.single('image'), createCourse);
 
 // Route to get all courses
 router.get('/courses', getAllCourses);
@@ -23,6 +23,6 @@ router.get('/courses/:id', getCourseById);
 router.put('/courses/:id', updateCourse);
 
 // Route to delete a course by its ID
-router.delete('/courses/:id', deleteCourse);
+router.delete('/:id', deleteCourse);
 
 module.exports = router;

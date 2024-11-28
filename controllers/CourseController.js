@@ -15,16 +15,15 @@ const createCourse = async (req, res) => {
       whatYouWillLearn 
     } = req.body;
 
+    // Safely parse the sections (handle invalid JSON input)
     let sections = [];
     try {
       sections = JSON.parse(req.body.sections); // Safely parse JSON string
     } catch (error) {
-      return res.status(400).json({ message: 'Invalid sections format' });
+      return res.status(400).json({ message: 'Invalid sections format. Please ensure it is a valid JSON string.' });
     }
 
-    console.log(req.body);
-
-    // Validate that sections and lessons contain required fields
+    // Validate sections and lessons
     sections.forEach(section => {
       if (!section.title) {
         throw new Error('Each section must have a title');
@@ -42,11 +41,12 @@ const createCourse = async (req, res) => {
       });
     });
 
-    // Ensure optional fields are arrays (or set defaults)
+    // Ensure optional fields are arrays (or set defaults if not provided)
     const parsedWhoIsThisCourseFor = whoIsThisCourseFor ? JSON.parse(whoIsThisCourseFor) : [];
     const parsedSkills = skills ? JSON.parse(skills) : [];
     const parsedWhatYouWillLearn = whatYouWillLearn ? JSON.parse(whatYouWillLearn) : [];
 
+    // Handle thumbnail upload
     let thumbnailUrl = '';
     if (req.file) {
       const uploadResult = await cloudinary.uploader.upload(req.file.path, {
@@ -55,10 +55,11 @@ const createCourse = async (req, res) => {
       thumbnailUrl = uploadResult.secure_url;
     }
 
+    // Create a new course with validated data
     const newCourse = new Course({
       title,
       description,
-      price: Number(price),
+      price: Number(price), // Ensure price is a number
       thumbnail: thumbnailUrl,
       sections,
       level: level.toLowerCase(),
@@ -69,14 +70,15 @@ const createCourse = async (req, res) => {
       whatYouWillLearn: parsedWhatYouWillLearn,
     });
 
+    // Save course to the database
     const savedCourse = await newCourse.save();
     res.status(201).json({ message: 'Course created successfully', course: savedCourse });
+    
   } catch (error) {
     console.error('Course Creation Error:', error);
     res.status(500).json({ message: 'Failed to create course', error: error.message });
   }
 };
-
 
 // Get all courses
 const getAllCourses = async (req, res) => {
