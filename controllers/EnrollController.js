@@ -3,6 +3,7 @@ const User = require('../model/Users');
 const Course = require('../model/Course');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const sendEmail = require('./EmailController');
 require('dotenv').config();
 const razorpayInstance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID, 
@@ -84,7 +85,11 @@ const verifyEnrollment = async (req, res) => {
     // Add course to user's enrolled courses
     user.enrolledCourses.push(enrollment._id);
     await user.save();
-
+sendEmail(user.email, process.env.NODEMAILER_USER, "New Enrollment",  ` New Enrollment Details
+    User: ${user.name}
+    Course: ${course.title}
+` )
+sendEmail(process.env.NODEMAILER_USER, user.email, "Successful Enrollment", `You have SuccessFully enrolled to ${course.title}`)
     res.status(201).json({ message: 'Payment successful and enrollment completed' });
   } catch (error) {
     console.error('Error in payment verification or enrollment: ', error);

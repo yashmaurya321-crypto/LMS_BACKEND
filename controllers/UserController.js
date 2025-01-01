@@ -2,6 +2,7 @@ const User = require('../model/Users')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {generateAccessToken, generateRefreshToken} = require("./AuthController");
+const sendEmail = require('./EmailController');
 
 const userRegister = async (req, res) => {
     const { name, email, password } = req.body;
@@ -33,8 +34,7 @@ const userRegister = async (req, res) => {
       
       // Save the new user to the database
       await newUser.save();
-      
-      // Respond with a success message
+      sendEmail(email, process.env.NODEMAILER_USER, "New User Registered", `New user Registered, name : ${name}, email : ${email}`)
       res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
       // Catch and handle any errors
