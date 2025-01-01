@@ -10,6 +10,7 @@ router.post('/login', loginUser);
 router.post('/logout',verifyAccessToken, logut);
 router.get('/users', verifyAccessToken, async(req, res) => {
     const data = await User.find();
+    console.log("all users ",data);
     res.send(data);
 });
 module.exports = router;

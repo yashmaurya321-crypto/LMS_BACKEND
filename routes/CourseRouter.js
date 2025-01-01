@@ -6,6 +6,7 @@ const {
     getCourseById,
     updateCourse,
     deleteCourse, 
+    getEnrolledStudent
 } = require('../controllers/CourseController')
 const { verifyAccessToken } = require('../controllers/AuthController')
 const multer = require('multer');
@@ -24,5 +25,7 @@ router.put('/courses/:id', updateCourse);
 
 // Route to delete a course by its ID
 router.delete('/:id', deleteCourse);
+
+router.get('/students/:courseId', getEnrolledStudent)
 
 module.exports = router;

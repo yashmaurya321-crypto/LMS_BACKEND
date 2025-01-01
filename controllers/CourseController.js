@@ -1,4 +1,5 @@
-const Course = require('../model/Course')
+const Course = require('../model/Course');
+const Enrollment = require('../model/Enrollment');
 const cloudinary = require('cloudinary').v2;
 
 const createCourse = async (req, res) => {
@@ -168,10 +169,31 @@ const deleteCourse = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+
+  const getEnrolledStudent = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+  console.log(courseId);
+      if (!courseId) {
+        return res.status(400).json({ error: "Course ID is required." });
+      }
+  
+      const course = await Enrollment.find({ courseId });
+  
+      const numOfStudents = course.length;
+  
+      res.status(200).json({ numOfStudents });
+    } catch (error) {
+      console.error("Error fetching enrolled students:", error);
+      res.status(500).json({ error: "An error occurred while fetching enrolled students." });
+    }
+  };
+  
   module.exports = {
     createCourse,
     getAllCourses,
     getCourseById,
     updateCourse,
     deleteCourse,
+    getEnrolledStudent 
   };        
