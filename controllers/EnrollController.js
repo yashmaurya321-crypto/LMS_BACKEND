@@ -44,7 +44,7 @@ const createEnrollment = async (req, res) => {
 
 const verifyEnrollment = async (req, res) => {
   try {
-    const { courseId, paymentId, orderId, signature } = req.body;
+    const { courseId, paymentId, orderId, signature, userId } = req.body;
 
     // Verify payment signature
     const body = orderId + '|' + paymentId;
@@ -57,8 +57,7 @@ const verifyEnrollment = async (req, res) => {
     }
 
     
-    const user = await User.findById(req.user.userId);  // Make sure user is fetched from DB
-
+    const user = await User.findById(userId);  
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

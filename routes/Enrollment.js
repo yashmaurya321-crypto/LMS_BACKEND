@@ -4,7 +4,7 @@ const {  verifyEnrollment, createEnrollment   } = require('../controllers/Enroll
 const { verifyAccessToken } = require('../controllers/AuthController')
 router.post('/createEnrollment', createEnrollment);
 
-router.post('/verifyEnrollment',verifyAccessToken, verifyEnrollment);
+router.post('/verifyEnrollment', verifyEnrollment);
 
 
 module.exports = router
