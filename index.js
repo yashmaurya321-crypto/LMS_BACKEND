@@ -12,9 +12,17 @@ const cors = require('cors');
 
 require('dotenv').config();
 
+const allowedOrigins = ['http://localhost:3000', 'https://your-deployed-domain.com'];
+
 app.use(cors({
-  origin: '*', 
-    credentials: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow credentials like cookies
 }));
 app.use(cookieParser());
 require('./db');
