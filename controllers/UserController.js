@@ -63,10 +63,10 @@ const userRegister = async (req, res) => {
         const accessToken = generateAccessToken(user);
 
         res.cookie('token', accessToken, {
-            httpOnly: true, // Prevents JavaScript access to the cookie
-            secure: process.env.NODE_ENV === 'production', // Ensures cookies are sent over HTTPS in production
-            sameSite: 'Strict', // Prevents CSRF attacks
-        });
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+          sameSite: 'Strict', // Or 'Lax' if integrating third-party APIs
+      });
 
         res.status(200).json({ message: 'Login successful' });
     } catch (error) {
@@ -75,7 +75,29 @@ const userRegister = async (req, res) => {
     }
 };
 
+const getUser = async (req, res) => {
+  try {
+    // Extract user ID from `req.user`
+    const userId = req.user.userId;
+
+    // Find the user by ID, exclude the password field, and populate `enrolledCourses`
+    const user = await User.findById(userId)
+      .select("-password") // Exclude the password field
+      .populate("enrolledCourses"); // Populate `enrolledCourses`
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 module.exports = {
     userRegister,
-    loginUser
+    loginUser,
+    getUser
 }
