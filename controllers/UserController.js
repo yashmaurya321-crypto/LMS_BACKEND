@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {generateAccessToken, generateRefreshToken} = require("./AuthController");
 const sendEmail = require('./EmailController');
-
+const cloudinary = require('cloudinary').v2;
 const userRegister = async (req, res) => {
     const { name, email, password } = req.body;
     
@@ -143,10 +143,41 @@ const logut = async (req, res) => {
   res.status(200).json({ message: 'Logout successful' });
 }
 
+const uploadProfileImage = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'profile_pictures',
+    });
+
+    // Update the user's profile picture URL in the database
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { image: result.secure_url },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Profile picture updated', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to upload profile picture', error: error.message });
+  }
+};
+
 module.exports = {
     userRegister,
     loginUser,
     rgenerateRefreshToken,
 getUser,
-logut
+logut,
+uploadProfileImage
 }
