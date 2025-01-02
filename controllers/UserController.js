@@ -69,8 +69,8 @@ console.log(isPasswordValid)
    
     res.cookie('token', accessToken, {
       httpOnly: true,
-      secure: false,   
-      sameSite: 'lax',      
+      secure: true,   
+      sameSite: 'None',      
     });
   
     

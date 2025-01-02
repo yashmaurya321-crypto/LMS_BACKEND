@@ -6,7 +6,7 @@ const verifyAccessToken =  (req, res, next) => {
   try {
        
     const token = req.cookies.token;
-      
+      console.log("token from cookie",token);
       if (!token) {
           return res.status(401).json({ error: "Please log in to access" });
       }
@@ -17,7 +17,7 @@ const verifyAccessToken =  (req, res, next) => {
           if (!decodedData.userId) {
               return res.status(403).json({ error: "Invalid token" });
           }
-          
+          console.log("decoded data ",decodedData)
           req.user = { userId: decodedData.userId, role: decodedData.role };
           next();
       } catch (verifyError) {
