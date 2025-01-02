@@ -45,53 +45,59 @@ const userRegister = async (req, res) => {
 
   const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        // Check if the user exists
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'User not found' });
-        }
-
-        // Verify password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Invalid password' });
-        }
-
-        // Generate access token
-        const accessToken = generateAccessToken(user);
-
-        res.cookie('token', accessToken, {
-          httpOnly: true, // Makes the cookie inaccessible via JavaScript (helps prevent XSS attacks)
-         
-        });
-console.log("Successfully logged in", user, accessToken);
-        res.status(200).json({ message: 'Login successful' });
+      const { email, password } = req.body;
+  
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+  
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: 'Invalid password' });
+      }
+  
+      const accessToken = generateAccessToken(user);
+  
+      res.cookie('token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+  
+      // Send user data (excluding password) along with success message
+      const userData = user.toObject();
+      delete userData.password;
+  console.log("succes");
+      res.status(200).json({ 
+        message: 'Login successful',
+        user: userData
+      });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-};
+  };
 
-const getUser = async (req, res) => {
-  try {
-    const userId = req.user.userId;
-
-    const user = await User.findById(userId)
-      .select("-password") // Exclude the password field
-      .populate("enrolledCourses"); // Populate `enrolledCourses`
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+  const getUser = async (req, res) => {
+    try {
+      const userId = req.user.userId;
+  
+      const user = await User.findById(userId)
+        .select("-password")
+        .populate("enrolledCourses");
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      res.status(500).json({ error: "Server error" });
     }
-console.log("User data from get user:", user);
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
+  };
 const uploadProfileImage = async (req, res) => {
   try {
     const { userId } = req.body;

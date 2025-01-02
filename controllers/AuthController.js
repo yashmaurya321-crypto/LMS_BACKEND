@@ -17,7 +17,7 @@ const verifyAccessToken =  (req, res, next) => {
           if (!decodedData.userId) {
               return res.status(403).json({ error: "Invalid token" });
           }
-          consaole.log("decoded data ",decodedData)
+          console.log("decoded data ",decodedData)
           req.user = { userId: decodedData.userId, role: decodedData.role };
           next();
       } catch (verifyError) {
