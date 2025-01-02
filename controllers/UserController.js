@@ -67,7 +67,7 @@ const userRegister = async (req, res) => {
           secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
           sameSite: 'Strict', // Or 'Lax' if integrating third-party APIs
       });
-
+console.log("Successfully logged in", user, accessToken);
         res.status(200).json({ message: 'Login successful' });
     } catch (error) {
         console.error('Login error:', error);
