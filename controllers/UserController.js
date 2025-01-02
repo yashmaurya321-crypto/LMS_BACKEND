@@ -63,10 +63,9 @@ const userRegister = async (req, res) => {
         const accessToken = generateAccessToken(user);
 
         res.cookie('token', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-          sameSite: 'Strict', // Or 'Lax' if integrating third-party APIs
-      });
+          httpOnly: true, // Makes the cookie inaccessible via JavaScript (helps prevent XSS attacks)
+         
+        });
 console.log("Successfully logged in", user, accessToken);
         res.status(200).json({ message: 'Login successful' });
     } catch (error) {
@@ -77,10 +76,8 @@ console.log("Successfully logged in", user, accessToken);
 
 const getUser = async (req, res) => {
   try {
-    // Extract user ID from `req.user`
     const userId = req.user.userId;
 
-    // Find the user by ID, exclude the password field, and populate `enrolledCourses`
     const user = await User.findById(userId)
       .select("-password") // Exclude the password field
       .populate("enrolledCourses"); // Populate `enrolledCourses`
@@ -88,7 +85,7 @@ const getUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
+console.log("User data from get user:", user);
     res.status(200).json({ user });
   } catch (error) {
     console.error("Error fetching user data:", error);
