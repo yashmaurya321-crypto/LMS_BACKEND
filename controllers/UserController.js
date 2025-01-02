@@ -95,9 +95,60 @@ const getUser = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+const uploadProfileImage = async (req, res) => {
+  try {
+    const { userId } = req.body;
 
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file provided' });
+    }
+
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'profile_pictures', // You can change folder name as needed
+    });
+
+    // Update the user's profile picture URL in the database
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { image: result.secure_url },  // Save Cloudinary image URL in the 'image' field
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Send response with the updated user and image URL
+    res.status(200).json({
+      message: 'Profile picture updated',
+      user: { image: user.image },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to upload profile picture', error: error.message });
+  }
+};
+const logut = (req, res) => {
+  try {
+    // Clear the token cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Ensure secure flag is set in production
+      sameSite: "strict",
+    });
+
+    // Send success response
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Error logging out:", error);
+    res.status(500).json({ error: "Server error during logout" });
+  }
+};
 module.exports = {
     userRegister,
     loginUser,
-    getUser
+    getUser,
+    uploadProfileImage,
+    logut
 }
