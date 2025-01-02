@@ -12,8 +12,10 @@ const cors = require('cors');
 
 require('dotenv').config();
 
+const allowedOrigins = ['http://localhost:3000', 'https://lms-6aiv.onrender.com/'];
+
 app.use(cors({
-   origin: 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(cookieParser());
